@@ -1,4 +1,5 @@
 #include <iostream>
+using namespace std;
 
 class Node{
     public:
@@ -15,10 +16,7 @@ class AVLTree{
         Node *root;
         AVLTree() : root(NULL){};
 
-        bool isTreeEmpty(){
-            if (root==NULL) return true;
-            return false;
-        }
+        
         
         int height(Node *root){
             if (root==NULL) return -1;
@@ -42,6 +40,14 @@ class AVLTree{
             Node * temp=node;
             while (temp->left!=NULL){
                 temp=temp->left;
+            }
+            return temp;
+        }
+
+        Node* maxNode(Node * node){
+            Node * temp=node;
+            while (temp->right!=NULL){
+                temp=temp->right;
             }
             return temp;
         }
@@ -104,44 +110,88 @@ class AVLTree{
             else return search(root->right,data);
 
         }
-
-        Node *deleteNode(Node * root, int data){
-            //Normal BST DELETION
-            if (root==NULL) return NULL;
-
-            else if (data<root->data){
-                root->left=deleteNode(root->left,data);
-            }
-            else if (data>root->data){
-                root->right=deleteNode(root->right,data);
-            }
-            else{
-
-                Node *temp =minNode(root->right);
-                root->data=temp->data;
-                root->right=deleteNode(root->right,temp->data);
-            }
-
-            int bal=balanceFactor(root);
-
-            if (bal==2 && balanceFactor(root->left)>-1) return rightRotate(root);
+        void printRange(Node *root, int k1, int k2)
+        {
             
-            else if (bal==-2 && balanceFactor(root->right)<1) return leftRotate(root);
+            if ( NULL == root )
+                return;
 
-            else if (bal==2 && balanceFactor(root->left)==-1){
-                root->left=leftRotate(root->left);
-                return rightRotate(root);
-            }
-            else if (bal==-2 && balanceFactor(root->right)==1){
-                root->right=rightRotate(root->right);
-                return leftRotate(root);
-            }
-            return root;
+            if ( k1 < root->data )
+                printRange(root->left, k1, k2);
+
+            if ( k1 <= root->data && k2 >= root->data )
+                cout<<root->data<<" , ";
+
+            printRange(root->right, k1, k2);
         }
+
+        void subTree(Node *root, int k){
+            Node *subTreeRoot= search(root,k);
             
+            
+            inorder(subTreeRoot);
+
+        }
+        void inorder(Node *root){
+
+            if (root==NULL) return;
+            inorder(root->left);
+            cout<<root->data<<" , ";
+            inorder(root->right);
+
+        }
+
+
+
+
 };
 int main(){
+
+    AVLTree tree;
+    int n;
+    cout<<"CREATE AVL TREE"<<endl;
+    cout<<"How many nodes would you like : ";
+    cin>>n;
     
-    AVLTree *tree;
+    for (int i=0;i<n;i++){
+        int temp;
+        cout<<"Enter the data of node "<<i+1<<": ";
+        cin>>temp;
+        Node * newNode=new Node(temp);
+        tree.root=tree.insert(tree.root,newNode);
+    }
+    //between 2 values
+    int k1,k2;
+    cout<<endl<<endl;
+    cout<<"To find the range k1 <= k <= k2 "<<endl;
+    cout<<"Enter k1 : ";
+    cin>>k1;
+    cout<<"Enter k2 : ";
+    cin>>k2;
+    tree.printRange(tree.root,k1,k2);
+    cout<<endl<<endl;
+    // k>=k1
+    cout<<"To find the range k1>= k"<<endl;
+    cout<<"Enter k1 : ";
+    cin>>k1;
     
-}
+    tree.printRange(tree.root,k1,tree.maxNode(tree.root)->data);
+    cout<<endl<<endl;
+
+    // k<=k2
+
+    cout<<"To find the range k1<= k"<<endl;
+    cout<<"Enter k1 : ";
+    cin>>k1;
+    tree.printRange(tree.root,tree.minNode(tree.root)->data,k1);
+    cout<<endl<<endl;
+
+    //to find the subtree
+    cout<<"To find the subtree of the node k "<<endl;
+    cout<<"Enter k : ";
+    cin>>k1;
+   
+    tree.subTree(tree.root,k1);
+    cout<<endl
+
+};
